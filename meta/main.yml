@@ -1,6 +1,7 @@
 ---
-dependencies: []
-
+dependencies:
+  - role: gantsign.golang
+  
 galaxy_info:
   author: Eugene de Beste
   description: Compiles and installs Singularity container software on Linux machines.
