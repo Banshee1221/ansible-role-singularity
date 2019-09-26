@@ -1,0 +1,7 @@
+- name: Include vars for {{ ansible_os_family }}-based distro
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Install packages for building Singularity
+  package:
+    name: "{{ packages }}"
+    update_cache: true

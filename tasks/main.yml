@@ -1,0 +1,54 @@
+- name: Remove previously install Singularity via package manager
+  package:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - singularity
+    - singularity-container
+
+- name: Check if Singularity in PATH
+  shell: bash -lc "which singularity"
+  register: singularity_check
+  failed_when: singularity_check.rc != 0
+  ignore_errors: yes
+
+- name: Check and delete installed Singularity version
+  block:
+    - name: Get existing version
+      shell: bash -lc "singularity --version"
+      register: singularity_check_version
+      when: singularity_check.rc == 0
+
+    - name: Delete Singularity if existing version is different
+      file:
+        path: "{{ singularity_install_dir }}/"
+        state: absent
+      when: "(singularity_check_version.stdout.split(' ')[-1] | string).find(singularity_version | string) == 0"
+  when: singularity_check.rc == 0
+
+- name: Delete previous compiles by this role
+  block:
+    - find:
+        paths: "{{ singularity_build_dir }}/"
+        patterns: "^singularity*"
+        file_type: any
+        use_regex: true
+      register: files_to_delete
+
+    - file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ files_to_delete.files }}"
+
+- include: dependencies.yml
+- include: build.yml
+
+- name: Update PATH
+  copy:
+    dest: /etc/profile.d/singularity.sh
+    content: 'PATH=$PATH:{{ singularity_install_dir }}/{{ singularity_verison }}/bin'
+
+- name: Template out Singularity conf
+  template:
+    src: "{{ role_path }}/files/singularity.conf_{{ singularity_version }}.j2"
+    dest: "{{ singularity_install_dir }}/{{ singularity_verison }}/etc/singularity/singularity.conf"

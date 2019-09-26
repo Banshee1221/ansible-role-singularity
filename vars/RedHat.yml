@@ -1,0 +1,7 @@
+packages:
+  - '@Development Tools'
+  - openssl-devel 
+  - libuuid-devel 
+  - libseccomp-devel 
+  - wget 
+  - squashfs-tools

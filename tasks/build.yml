@@ -1,0 +1,41 @@
+- name: Fetch singularity source
+  local_action:
+    module: get_url
+    url: "{{ singularity_release_url }}"
+    dest: "{{ singularity_build_dir }}"
+  run_once: True
+
+- name: Extract singularity source
+  unarchive:
+    src: "{{ singularity_build_dir }}/singularity-{{singularity_verison}}.tar.gz"
+    dest: "{{ singularity_build_dir }}"
+
+- name: Run configure script
+  command: ./mconfig --prefix={{ singularity_install_dir }}/{{ singularity_verison }}/
+  args:
+    chdir: "{{ singularity_build_dir }}/singularity"
+    creates: "{{ singularity_build_dir }}/singularity/builddir/Makefile"
+  environment:
+    PATH: '{{ golang_install_dir }}/{{ singularity_verison }}/bin:{{ ansible_env.PATH }}'
+    GOROOT: '{{ golang_install_dir }}'
+    GOPATH: '{{ golang_gopath }}'
+
+- name: Run make script
+  command: make -j {{ ansible_processor_vcpus }}
+  args:
+    chdir: "{{ singularity_build_dir }}/singularity/builddir"
+    creates: "{{ singularity_build_dir }}/singularity/builddir/singularity"
+  environment:
+    PATH: '{{ golang_install_dir }}/bin:{{ ansible_env.PATH }}'
+    GOROOT: '{{ golang_install_dir }}'
+    GOPATH: '{{ golang_gopath }}'
+
+- name: Run make install script
+  command: make install
+  args:
+    chdir: "{{ singularity_build_dir }}/singularity/builddir"
+    creates: "{{ singularity_install_dir }}/{{ singularity_verison }}/bin/singularity"
+  environment:
+    PATH: '{{ golang_install_dir }}/bin:{{ ansible_env.PATH }}'
+    GOROOT: '{{ golang_install_dir }}'
+    GOPATH: '{{ golang_gopath }}'
