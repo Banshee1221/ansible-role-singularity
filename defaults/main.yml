@@ -1,10 +1,10 @@
 # editable
-singularity_verison: 3.2.0
+singularity_version: 3.2.0
 singularity_install_dir: /opt/singularity
 singularity_build_dir: /tmp
 remove_build_deps: false
 
 # fixed
-singularity_release_url: https://github.com/sylabs/singularity/releases/download/v{{singularity_verison}}/singularity-{{singularity_verison}}.tar.gz
+singularity_release_url: https://github.com/sylabs/singularity/releases/download/v{{singularity_version}}/singularity-{{singularity_version}}.tar.gz
 golang_install_dir: /opt/go/{{ golang_version }}
 golang_gopath: /opt/go/packages
