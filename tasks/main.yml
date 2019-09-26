@@ -23,7 +23,7 @@
       file:
         path: "{{ singularity_install_dir }}/"
         state: absent
-      when: "(singularity_check_version.stdout.split(' ')[-1] | string).find(singularity_version | string) == 0"
+      when: "(singularity_check_version.stdout.split(' ')[-1] | string).find(singularity_version | string) != 0"
   when: singularity_check.rc == 0
 
 - name: Delete previous compiles by this role
